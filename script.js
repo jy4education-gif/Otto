@@ -1,6 +1,6 @@
 // Small helpers: download and copy the poem
-document.addEventListener('DOMContentLoaded', function(){
-  const pre = document.querySelector('#poem pre');
+document.addEventListener('DOMContentLoaded', async function(){
+  const contentEl = document.getElementById('poem-content');
   const downloadBtn = document.getElementById('download');
   const copyBtn = document.getElementById('copy');
 
@@ -25,14 +25,22 @@ document.addEventListener('DOMContentLoaded', function(){
     return '✳️';
   }
 
-  if(pre){
-    const lines = pre.textContent.split(/\r?\n/);
+  // Load poem from gedicht.txt
+  try {
+    const resp = await fetch('gedicht.txt');
+    const text = await resp.text();
+    const lines = text.split(/\r?\n/);
     const mapped = lines.map(l => {
       const emoji = mapLineToEmoji(l);
       return l.trim() ? `${emoji} ${l}` : '';
     });
-    pre.textContent = mapped.join('\n');
+    contentEl.textContent = mapped.join('\n');
+  } catch(e) {
+    contentEl.textContent = 'Error loading gedicht.txt';
+    console.error(e);
   }
+
+  const pre = contentEl;
 
   if(downloadBtn){
     downloadBtn.addEventListener('click', function(){
